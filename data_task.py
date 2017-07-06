@@ -122,16 +122,16 @@ def main(model, n_iter, n_batch, n_hidden, capacity, comp, FFT):
 		ind = list(range(784))
 		shuffle(ind)
 
-		mnist = input_data.read_data_sets("/tmp/data/", one_hot=False)
+		# mnist = input_data.read_data_sets("/tmp/data/", one_hot=False)
 
 		import h5py
 
 		with h5py.File('data/gaussian.h5', 'r') as hf:
-    		data = hf['data'][:]
-    		labels = hf['labels'][:]
-    
-			data = np.squeeze(data)
-			labels = np.squeeze(labels)
+            data = hf['data'][:]
+            labels = hf['labels'][:]
+
+		data = np.squeeze(data)
+		labels = np.squeeze(labels)
 
 
 		sess.run(init)
@@ -141,7 +141,7 @@ def main(model, n_iter, n_batch, n_hidden, capacity, comp, FFT):
 
 		while step < n_iter:
 
-			batch_x, batch_y = mnist_data(mnist, n_batch, ind, "train")
+			# batch_x, batch_y = mnist_data(mnist, n_batch, ind, "train")
 			batch_x, batch_y = my_next_batch(n_batch, data, labels)
 
 			loss, acc = sess.run([cost, accuracy], feed_dict={x:batch_x,y:batch_y})
@@ -153,7 +153,9 @@ def main(model, n_iter, n_batch, n_hidden, capacity, comp, FFT):
 
 
 			if step % 500 == 499:
-				val_x, val_y = mnist_data(mnist, n_val, ind, "validation")
+				# val_x, val_y = mnist_data(mnist, n_val, ind, "validation")
+				val_x, val_y = my_next_batch(n_batch, data, labels)
+				
 				val_index = 0
 				val_acc_list = []
 				val_loss_list = []
@@ -179,7 +181,17 @@ def main(model, n_iter, n_batch, n_hidden, capacity, comp, FFT):
 		
 		# --- test ----------------------
 
-		test_x, test_y = mnist_data(mnist, n_test, ind, "test")
+		with h5py.File('data/gaussian_test.h5', 'r') as hf:
+    		data_test = hf['data'][:]
+    		labels_test = hf['labels'][:]
+    
+		data_test = np.squeeze(data)
+		labels_test = np.squeeze(labels)
+
+		# test_x, test_y = mnist_data(mnist, n_test, ind, "test")
+		test_x, test_y = my_next_batch(n_batch, data_test, labels)
+
+
 		test_index = 0
 		test_acc_list = []
 		test_loss_list = []
